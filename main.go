@@ -9,8 +9,10 @@ func main() {
 
 	ch := make(chan Message, 100)
 
+	// goroutine to continously listen to channel
+	go listener(ch)
+
 	http.HandleFunc("/send", middleWare(sendHandler, ch, "POST"))
-	http.HandleFunc("/receive", middleWare(receiveHandler, ch, "GET"))
 
 	log.Println("Listening to localhost:8080")
 

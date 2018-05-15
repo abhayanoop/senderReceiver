@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
+	"os"
 )
 
 type Message struct {
 	Content string `json: "content"`
 }
+
+var exitMessage = "/exit"
 
 func sendHandler(w http.ResponseWriter, r *http.Request, ch chan Message) {
 
@@ -27,39 +29,28 @@ func sendHandler(w http.ResponseWriter, r *http.Request, ch chan Message) {
 		return
 	}
 
+	if message.Content == exitMessage {
+		close(ch)
+		fmt.Println("Connection closed. \n\nTerminating program...")
+		os.Exit(0)
+	}
+
 	ch <- message
 
 	fmt.Fprintf(w, "%v", "Message sent")
 }
 
-func receiveHandler(w http.ResponseWriter, r *http.Request, ch chan Message) {
-
-	var (
-		msgs       []string
-		noMessages bool = false
-	)
+func listener(ch chan Message) {
 
 	for {
 
-		if noMessages {
+		resp, ok := <-ch
+
+		if !ok {
 			break
 		}
 
-		fmt.Println("Loop start")
-
-		select {
-
-		case resp := <-ch:
-
-			msg := Message(resp)
-			msgs = append(msgs, msg.Content)
-
-		default:
-			noMessages = true
-		}
+		msg := Message(resp)
+		fmt.Println(msg.Content)
 	}
-
-	fmt.Fprintf(w, "%v", strings.Join(msgs, "\n"))
-
-	return
 }
