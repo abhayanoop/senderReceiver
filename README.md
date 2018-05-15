@@ -15,22 +15,24 @@ raw application/JSON body
   
 request body example = {"content" : "Hi. This is my first message"}
 ```
+
+
+* Receiver is a goroutine which continously listens to the sender channel and prints the message on console.
+
+* To terminate the communication, simple send the message "/exit" using the send API.     
   
-&nbsp;&nbsp;* GET /receive    
-  
-Note: Multiple messages can be sent with multiple send API calls. Receive API will return all the messages to be received.    
+Note: Multiple messages can be sent with multiple send API calls    
   
   
 Example request in postman:
   
-1. POST localhost:8080/send    
+POST localhost:8080/send    
  ``` 
  Body raw application/JSON =>    
   
  {"content":"Example message"}
  ```
   
-2. GET localhost:8080/receive
 
 
 
